@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Un Questionnaire s'imposeeeee !</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #app { width: 800px; min-height: 580px; position: relative; }
+  #intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 580px;
+    gap: 0;
+  }
+  #intro h1 {
+    color: #f9e2af;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  #intro p {
+    color: #cdd6f4;
+    font-size: 1.05em;
+    margin-bottom: 22px;
+  }
+  .separateur {
+    width: 500px;
+    height: 2px;
+    background: #313244;
+    margin-bottom: 28px;
+  }
+  #intro .regles {
+    font-size: 1em;
+    line-height: 2.2;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+  #quiz { display: none; min-height: 580px; position: relative; padding: 20px; }
+
+  #lbl-num   { position: absolute; top: 20px; left: 20px; color: #6c7086; font-size: 0.95em; }
+  #lbl-score { position: absolute; top: 20px; right: 20px; color: #f9e2af; font-size: 1em; }
+
+  #lbl-question {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #cdd6f4;
+    margin: 60px auto 30px;
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  #boutons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .btn-reponse {
+    width: 600px;
+    padding: 14px 20px;
+    background: #313244;
+    color: #cdd6f4;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .btn-reponse:hover:not(:disabled) { background: #45475a; }
+  .btn-reponse:disabled { cursor: default; opacity: 0.7; }
+  .btn-reponse.correct  { background: #a6e3a1 !important; color: #1e1e2e !important; opacity: 1 !important; }
+  .btn-reponse.faux     { background: #f38ba8 !important; color: #1e1e2e !important; opacity: 1 !important; }
+  .btn-reponse.grise    { color: #6c7086 !important; }
+
+  #btn-suivant {
+    display: none;
+    margin: 30px auto 0;
+    padding: 12px 28px;
+    background: #a6e3a1;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #btn-suivant:hover { background: #89dceb; }
+  #overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #overlay.actif { display: flex; }
+
+  #overlay-box {
+    background: #11111b;
+    border-radius: 14px;
+    padding: 30px 40px;
+    max-width: 580px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #overlay-img {
+    max-width: 280px;
+    max-height: 200px;
+    border-radius: 10px;
+    display: none;
+  }
+
+  #overlay-msg {
+    font-size: 1.15em;
+    font-weight: bold;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  #overlay-indice {
+    color: #6c7086;
+    font-size: 0.9em;
+  }
+
+  .btn-start {
+    padding: 14px 32px;
+    background: #a6e3a1;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .btn-start:hover { background: #89dceb; }
+
+  .btn-recommencer {
+    padding: 12px 28px;
+    background: #f9e2af;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .btn-recommencer:hover { background: #f9d47f; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="intro">
+    <h1>🎯 Un Questionnaire s'impose !</h1>
+    <p>Réponds honnêtement… si tu oses 😏</p>
+    <div class="separateur"></div>
+    <div class="regles">
+      📋 &nbsp; 4 questions t'attendent brk<br>
+      ✅ &nbsp; Choisis la réponse li twalmek<br>
+      💬 &nbsp; Chaque réponse affiche un message yadraaa<br>
+      🏆 &nbsp; Ton score s'affiche à la fin
+    </div>
+    <button class="btn-start" onclick="demarrer()">  Commencer →  </button>
+  </div>
+
+  <div id="quiz">
+    <span id="lbl-num"></span>
+    <span id="lbl-score">Score : 0</span>
+    <div id="lbl-question"></div>
+    <div id="boutons"></div>
+    <div style="text-align:center">
+      <button id="btn-suivant" onclick="questionSuivante()">Question suivante →</button>
+    </div>
+  </div>
+
+  <div id="overlay" onclick="fermerOverlay()">
+    <div id="overlay-box">
+      <img id="overlay-img" src="" alt="">
+      <div id="overlay-msg"></div>
+      <div id="overlay-indice">Clique win jat pour continuer</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    question: "Si ta vie était un film… tu me verrais comment ?",
+    reponses: [
+      "personnage principal qui reste jusqu'à la fin",
+      "un personnage secondaire qui peut mourrir a chaque instant",
+      "celle qui passe dans une scène de 2 secondes"
+    ],
+    bonne: 0,
+    messages_reponse: [
+      "✅\nEMMM tssema happy end 😊",
+      "❌\nAyhoooo tssema rak tchoufni kima neymar :\n une star quand je suis là, et vite oubliée quand je suis remplacée 😌",
+      "❌\naaaaaa nendeb hnaki aucun commentaire "
+    ],
+    images: ["6038.jpeg", "6040.jpeg", "6046.jpeg"]
+  },
+  {
+    question: "Dans la carte du monde de ta tête je suis :",
+    reponses: [
+      "un futur partenariat solide",
+      "un pays avec une relation évolutive",
+      "juste une zone de passage",
+      "Situation en observation : aucune décision tant que les résultats de l'analyse ne sont pas terminés"
+    ],
+    bonne: 0,
+    messages_reponse: [
+      "✅\nSahiiiiiit 😄",
+      "mmmmmmmmmmmm \nbonne réponse ",
+      "❌\nلماذا نحن هنا؟  سؤااال صعب سؤااال صعب",
+      "mmmmmm il s'agit de prendre une decision, les z'hommes ou pas les z'hommes?,\nsinon utilisateur déplacé vers dossier 'archives sentimentales'.\nAucune sauvegarde automatique"
+    ],
+    images: ["chine russe.jpeg", "6045.jpeg", "ola.jpeg", "6041.jpeg"]
+  },
+  {
+    question: "Dans un système informatique, je suis quoi ?",
+    reponses: [
+      "un thread secondaire",
+      "Un process critique",
+      "un bug qu'on ne sait pas encore si on garde ? 😏"
+    ],
+    bonne: 1,
+    messages_reponse: [
+      "Avertissement système ❌\nutile mais pas essentiel, donc en gros bouche trou -_-",
+      "Système validé ✔️\naccès full admin accordé, tu mérites une photo 3la had lkalam chbab 😄",
+      "Fatal Error ❌\nmmmmmm il s'agit de prendre une décision, les z'hommes ou pas les z'hommes, sinon utilisateur déplacé vers dossier 'archives sentimentales'. Aucune sauvegarde automatique"
+    ],
+    images: ["6042.jpeg", "6038.jpeg", "6041.jpeg"]
+  },
+  {
+    question: "Qui a peint la Joconde ?",
+    reponses: ["Michel-Ange", "Raphaël", "Picasso", "zinouba"],
+    bonne: 3,
+    messages_reponse: [
+      "bouuuuh Michel-Ange ❌\nkan sculpteur machi peintre !!! 🗿",
+      "ooooo wakhdaaa ❌\nRaph kan yerssam des madones",
+      "ba3daaa Picasso ❌",
+      "Tu as choisi zinouba ✅\nBravo ! C'est bien elle qui a mis au monde cette magnifique œuvre d'art !"
+    ],
+    images: ["mi.jpg", "raph.jpg", "pic.jpg", "6047.jpeg"]
+  }
+];
+
+let indexQ   = 0;
+let score    = 0;
+let enCours  = true;
+let historique = [];
+
+function demarrer() {
+  document.getElementById("intro").style.display = "none";
+  document.getElementById("quiz").style.display  = "block";
+  afficherQuestion();
+}
+
+function afficherQuestion() {
+  enCours = true;
+  document.getElementById("btn-suivant").style.display = "none";
+  fermerOverlay();
+
+  const q  = QUESTIONS[indexQ];
+  document.getElementById("lbl-question").textContent = q.question;
+  document.getElementById("lbl-num").textContent = `Question ${indexQ+1} / ${QUESTIONS.length}`;
+
+  const boutons = document.getElementById("boutons");
+  boutons.innerHTML = "";
+
+  q.reponses.forEach((rep, i) => {
+    const btn = document.createElement("button");
+    btn.className   = "btn-reponse";
+    btn.textContent = rep;
+    btn.onclick     = () => clic(i);
+    boutons.appendChild(btn);
+  });
+}
+
+function clic(idx) {
+  if (!enCours) return;
+  enCours = false;
+
+  const q        = QUESTIONS[indexQ];
+  const estBonne = idx === q.bonne;
+  const btns     = document.querySelectorAll(".btn-reponse");
+
+  btns[idx].classList.add(estBonne ? "correct" : "faux");
+
+  if (!estBonne) btns[q.bonne].classList.add("correct");
+
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i !== idx && i !== q.bonne) b.classList.add("grise");
+  });
+  if (estBonne) {
+    score++;
+    document.getElementById("lbl-score").textContent = `Score : ${score}`;
+  }
+  historique.push({
+    question     : q.question,
+    choix        : q.reponses[idx],
+    bonneReponse : q.reponses[q.bonne],
+    correct      : estBonne
+  });
+  localStorage.setItem("qcm_historique", JSON.stringify(historique));
+  localStorage.setItem("qcm_score", score);
+ 
+  afficherOverlay(q.messages_reponse[idx], estBonne, q.images[idx]);
+
+  if (indexQ < QUESTIONS.length - 1) {
+    document.getElementById("btn-suivant").style.display = "inline-block";
+  } else {
+    setTimeout(scoreFinal, 700);
+  }
+}
+
+function afficherOverlay(message, estBonne, image) {
+  const overlay = document.getElementById("overlay");
+  const img     = document.getElementById("overlay-img");
+  const msg     = document.getElementById("overlay-msg");
+  const indice  = document.getElementById("overlay-indice");
+
+  if (image) {
+    img.src             = image;
+    img.style.display   = "block";
+    img.onerror         = () => { img.style.display = "none"; };
+  } else {
+    img.style.display = "none";
+  }
+
+  msg.textContent  = message;
+  msg.style.color  = estBonne ? "#a6e3a1" : "#f38ba8";
+  indice.textContent = "Clique n'importe où pour continuer";
+  indice.style.display = "block";
+
+  overlay.classList.add("actif");
+}
+
+function fermerOverlay() {
+  document.getElementById("overlay").classList.remove("actif");
+}
+
+function questionSuivante() {
+  indexQ++;
+  afficherQuestion();
+}
+
+function scoreFinal() {
+  const pct = Math.round(score / QUESTIONS.length * 100);
+  let mention = pct === 100 ? "Parfait ! 🏆" :
+                pct >= 75   ? "Très bien !" :
+                pct >= 50   ? "Pas mal !" : "Continue à t'entraîner !";
+
+  document.getElementById("boutons").innerHTML = "";
+  document.getElementById("btn-suivant").style.display = "none";
+  document.getElementById("lbl-question").textContent  = "Quiz terminé !";
+  document.getElementById("lbl-num").textContent       = "";
+
+  const img    = document.getElementById("overlay-img");
+  const msg    = document.getElementById("overlay-msg");
+  const indice = document.getElementById("overlay-indice");
+
+  img.style.display    = "none";
+  msg.textContent      = `Score final : ${score} / ${QUESTIONS.length}  (${pct}%)\n\n${mention}\n\nEnvoi des réponses en cours...`;
+  msg.style.color      = "#f9e2af";
+  msg.style.whiteSpace = "pre-line";
+  indice.style.display = "none";
+  const box = document.getElementById("overlay-box");
+  if (!box.querySelector(".btn-recommencer")) {
+    const btnR = document.createElement("button");
+    btnR.className   = "btn-recommencer";
+    btnR.textContent = "Recommencer";
+    btnR.onclick     = recommencer;
+    box.appendChild(btnR);
+  }
+  document.getElementById("overlay").classList.add("actif");
+  const URL_FORMSPREE = "https://formspree.io/f/xnjrenzv"; 
+  let recapMail = "";
+  historique.forEach((item, index) => {
+    recapMail += `Question ${index + 1}: ${item.question}\n`;
+    recapMail += `👉 Réponse choisie: ${item.choix}\n`;
+    recapMail += `Resultat: ${item.correct ? "✅ JUSTE" : "❌ FAUX (Bonne réponse: " + item.bonneReponse + ")"}\n\n`;});
+  fetch(URL_FORMSPREE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json" },
+    body: JSON.stringify({
+      _subject: `🎯 Nouveau résultat au Quiz ! (${score}/${QUESTIONS.length})`,
+      Score: `${score} / ${QUESTIONS.length} (${pct}%)`,
+      Details: recapMail
+    }) })
+  .then(response => {
+    if (response.ok) {
+      msg.textContent = `Score final : ${score} / ${QUESTIONS.length}  (${pct}%)\n\n${mention}\n\n✨ Réponses envoyées avec succès chez l'admin !`;
+    } else {
+      msg.textContent = `Score final : ${score} / ${QUESTIONS.length}  (${pct}%)\n\n${mention}\n\n⚠️ Erreur lors de l'envoi des réponses.`;
+    } })
+  .catch(error => {
+    msg.textContent = `Score final : ${score} / ${QUESTIONS.length}  (${pct}%)\n\n${mention}\n\n⚠️ Problème de connexion pour l'envoi.`;
+  });}
+function recommencer() {
+  indexQ     = 0;
+  score      = 0;
+  historique = [];
+  document.getElementById("lbl-score").textContent = "Score : 0";
+  const box = document.getElementById("overlay-box");
+  box.querySelectorAll(".btn-recommencer").forEach(b => b.remove());
+  fermerOverlay();
+  afficherQuestion();}
+</script>
+</body>
+</html>
